@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Code Sample</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="icon" type="image/png" href="../images/frame1.png">
+  </head>
+  <body>
+    <div class="navigation">
+      <a href="../index.html" class="headerlink">Home</a>
+      <a href="./sample.html" class="headerlink">Code Sample</a>
+      <a href="./play.html" class="headerlink">Play</a>
+      <a href="./contact.html" class="headerlink">Contact</a>
+      <a href="./credit.html" class="headerlink">Credit</a>
+    </div>
+    <h1 class="text">Code Samples</h1>
+    <h2 class="text">Arrow Pad</h2>
+    </div class = "box">
+      <pre>
+        func _on_ArrowPad(area, direction):
+        if area.name == "player":
+          isMoving= false
+          allowMovement = true
+          if(currentDirection == "left"): #Depending on current direction, we need to move player to correct tile to land on ArrowPad properly.
+            position.x = 64 * floor(((position.x ) / 64))
+          if(currentDirection == "right"):
+            position.x = 64 * floor(((position.x ) / 64)) + 64
+          if(currentDirection == "down"):
+            position.y = 64 * floor(((position.y ) / 64)) + 52
+          if(currentDirection == "up"):
+            position.y = 64 * floor(((position.y ) / 64)) -12
+          match direction: #Depending on the direction of the ArrowPad, we will set variables to make the player move in that direction.
+            "left":
+              _setVars("left")
+            "right":
+              _setVars("right")
+            "down":
+              _setVars("down")
+            "up":
+              _setVars("up")
+          if(audioNode != null): #Lastly, we play the audio sound of a player moving onto the Arrowpad.
+            audioNode.launchpadsfxFlag = true	
+      </pre>
+  </div>
+  <h2 class="text">Determining to Save</h2>
+</div class = "box">
+  <pre>
+    func save():
+    timeSpent = snapped(runningTime, .001) #Need to round off timeSpent for consitency
+    var save_dict = { #Create a dictionary to represent level save
+      "level" : get_parent().name,
+      "collectedCoin" : collectedCoin,
+      "moves" : moves,
+      "timeSpent" : timeSpent,
+      "completed" : true,
+      "unlocked" : true
+    }
+    var save_game = FileAccess.open("user://savegame.save", FileAccess.READ) #Open current save on disc
+    var node_data 
+    while save_game.get_position() < save_game.get_length(): #Go through save file, look for current level just completed and determine if we should save or not.
+      var json_string = save_game.get_line()
+      var json = JSON.new()
+      var parse_result = json.parse(json_string)
+      if not parse_result == OK:
+        print("JSON Parse Error: ", json.get_error_message(), " in ", json_string, " at line ", json.get_error_line())
+        continue
+      node_data = json.get_data()
+      if node_data["level"] == get_parent().name:
+        break
+    if(node_data["collectedCoin"] != true && collectedCoin == true): #if the new result is better, we need to rewrite our save file.
+      repack(save_dict)
+      update()
+    elif(node_data["moves"] > moves) && node_data["collectedCoin"] == collectedCoin:
+      repack(save_dict)
+      update()
+    elif(node_data["timeSpent"] > timeSpent && node_data["collectedCoin"] == collectedCoin && (node_data["moves"] == moves)):
+      repack(save_dict)
+      update()
+    return true
+  </pre>
+</div>
+</div>
+  </body>
+</html>
